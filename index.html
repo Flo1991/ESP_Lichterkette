@@ -1,0 +1,76 @@
+<html><head>
+<script> src="strings.js"></script><script>
+window.onload = function () {
+var tags = document.getElementsByClassName('templated');
+for (var i=0; i<tags.length; ++i) {applyTemplate(tags[i]);}}
+function applyTemplate (tag) {
+for (var key in data) {var regexp = new RegExp('%'+key, 'g');tag.innerHTML = tag.innerHTML.replace(regexp, data[key]);}}
+</script><style>
+p {font: bold 3em Helvetica, Arial, Sans-Serif;color: white;padding: 0.1em;}
+#eins {text-shadow: 0 0 8px black;}
+o {font: bold 11em Helvetica, Arial, Sans-Serif;color: white;padding: 0.1em;}
+#einso {text-shadow: 0 0 8px black;}</style>
+<title>Light Stribe</title>
+</head><body><script>
+var sc=new Array("#aaaacc","#ddddFF","#ccccDD")
+var st=new Array("Arial Black","Arial Narrow","Times","Comic Sans MS")
+var sn=new Array()
+var mgb,mgr
+var i_sn=0
+var x=new Array();
+var crds=new Array();
+var lft=new Array();
+var brwi=navigator.userAgent 
+var ie5=document.all&&document.getElementById&&!brwi.match(/Opera/)
+var ns6=document.getElementById&&!document.all
+var opera=brwi.match(/Opera/)  
+var browserok=ie5||ns6||opera
+function rdm(range){
+rand=Math.floor(range*Math.random())
+return rand}
+function initsn(){
+if (ie5 || opera){
+mgb=document.body.clientHeight
+mgr=document.body.clientWidth}
+else if (ns6) {
+mgb=window.innerHeight
+mgr=window.innerWidth}
+for (i=0;i<=35;i++){
+crds[i]=0
+lft[i]=Math.random()*15
+x[i]=0.03+Math.random()/10
+sn[i]=document.getElementById("s"+i)
+sn[i].style.fontFamily=st[rdm(st.length)]
+sn[i].size=rdm(14)+8
+sn[i].style.fontSize=sn[i].size
+sn[i].style.color=sc[rdm(sc.length)]
+sn[i].sink=0.6*sn[i].size/5
+sn[i].posx=rdm(mgr-sn[i].size)
+sn[i].posy=rdm(6*mgb-mgb-6*sn[i].size)
+sn[i].style.left=sn[i].posx
+sn[i].style.top=sn[i].posy}
+movesn()}
+function movesn() {
+for (i=0;i<=35;i++) {
+crds[i] += x[i]
+sn[i].posy+=sn[i].sink
+sn[i].style.left=sn[i].posx+lft[i]*Math.sin(crds[i])
+sn[i].style.top=sn[i].posy
+if (sn[i].posy>=mgb-6*sn[i].size || parseInt(sn[i].style.left)>(mgr-3*lft[i])){
+sn[i].posx=rdm(mgr-sn[i].size)
+sn[i].posy=0}}
+var t=setTimeout("movesn()",50)}
+for (i=0;i<=35;i++) {
+document.write("<span id='s"+i+"' style='position:absolute;top:-"+22+"'>"+"*"+"</span>")}
+if (browserok) {
+window.onload=initsn}
+</script>
+<p id="eins">Merry Christmas</p>
+<h2>Color selection</h2>
+<form method="get">Choose a color <select name="color" ><option>RED</option><option>GREEN</option><option>BLUE</option><option>TURQUOIS</option><option>ORANGE</option><option>CYAN</option><option>WHITE</option><option>VIOLETT</option><option>PINK</option><option>YELLOW</option><option>BLACK</option></select>
+<h2>Effect selection</h2>
+Choose an effect <select name="effect" >
+<option>SETFULLCOLOR</option><option>FILLCOLOR</option><option>BLINK</option><option>RUNLED</option><option>ALTERNATING</option><option>RECOLOR</option><option>FADE</option><option>RAINBOW</option></select><br /><br />
+<input type="submit" name="doit" value="DO IT"> </form>
+<o id="einso">&#127876</o>
+</body></html>
