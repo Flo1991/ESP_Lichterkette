@@ -9,7 +9,13 @@ uint32_t usToTicks(uint32_t us) {
 }
 
 void ICACHE_RAM_ATTR pwm_timer_isr() {
-  Serial.print('.');
+  //Serial1.print('.');
+  Serial1.write((uint8_t) 254);
+  Serial1.write((uint8_t) 6);
+  Serial1.write((uint8_t) 128);
+  Serial1.write((uint8_t) 1);
+  Serial1.write((uint8_t) 50);
+   Serial1.write((uint8_t) 2);
   TEIE |= TEIE1;
 }
 
@@ -143,6 +149,7 @@ void setup() {
   delay(1000);
 
   Serial.begin(115200);
+  Serial1.begin(38400);
   Serial.setDebugOutput(true); 
   Serial.println();
 
