@@ -9,13 +9,13 @@ uint32_t usToTicks(uint32_t us) {
 }
 
 void ICACHE_RAM_ATTR pwm_timer_isr() {
-  //Serial1.print('.');
-  Serial1.write((uint8_t) 254);
+  Serial.print('.');
+ /* Serial1.write((uint8_t) 254);
   Serial1.write((uint8_t) 6);
   Serial1.write((uint8_t) 128);
   Serial1.write((uint8_t) 1);
   Serial1.write((uint8_t) 50);
-   Serial1.write((uint8_t) 2);
+   Serial1.write((uint8_t) 2);*/
   TEIE |= TEIE1;
 }
 
@@ -115,8 +115,133 @@ bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
        
 Serial.println(  path.c_str());
 
-Serial.print("Args count: "); 
-Serial.print(server.args());
+if(server.args() == 3) {
+
+uint8_t _color = 128;
+uint8_t _effect = 128;
+String color = server.arg(0);
+String effect = server.arg(1);
+Serial.println("color:" + color); 
+Serial.println("effect:" + effect); 
+ if(color == "RED"){ 
+      _color = 128;
+ }  else if(color == "GREEN"){
+      _color = 16;
+ }  else if(color == "BLUE"){
+      _color = 2;
+ }   else if(color == "TURQUOIS"){
+      _color = 25;
+ }   else if(color == "ORANGE"){
+      _color = 164;
+ }   else if(color == "CYAN"){
+      _color = 18;
+ }  else if(color == "WHITE"){
+      _color = 255;
+ }  else if(color == "VIOLETT"){
+      _color = 131;
+ }  else if(color == "PINK"){
+      _color = 129;
+ }  else if(color == "YELLOW"){
+      _color = 176;
+ }   else if(color == "BLACK"){
+      _color = 0;
+ }
+
+if(effect == "SETFULLCOLOR") {
+      _effect = 0;
+      Serial1.write((uint8_t) 254);
+  Serial1.write((uint8_t) 6);
+  Serial1.write((uint8_t) _effect);
+  Serial1.write((uint8_t) 1);
+  Serial1.write((uint8_t) 50);
+   Serial1.write((uint8_t) _color);
+    //  softuart.write(1,38400,254, 6, _effect ,1, _count, _color);
+}else if(effect == "FILLCOLOR"){
+      _effect = 1;
+            Serial1.write((uint8_t) 254);
+  Serial1.write((uint8_t) 7);
+  Serial1.write((uint8_t) _effect);
+  Serial1.write((uint8_t) 25);
+  Serial1.write((uint8_t) 50);
+   Serial1.write((uint8_t) _color);
+      Serial1.write((uint8_t) 0);
+    //  softuart.write(1,38400,254, 7, _effect ,25, _count, _color,0);
+} else if(effect == "BLINK"){
+      _effect = 2;
+                  Serial1.write((uint8_t) 254);
+  Serial1.write((uint8_t) 6);
+  Serial1.write((uint8_t) _effect);
+  Serial1.write((uint8_t) 29);
+  Serial1.write((uint8_t) 50);
+   Serial1.write((uint8_t) _color);
+    //  softuart.write(1,38400,254, 6, _effect ,20, _count, _color);
+} else if(effect == "RUNLED"){
+      _effect = 3;
+                        Serial1.write((uint8_t) 254);
+  Serial1.write((uint8_t) 7);
+  Serial1.write((uint8_t) _effect);
+  Serial1.write((uint8_t) 55);
+  Serial1.write((uint8_t) 50);
+   Serial1.write((uint8_t) _color);
+         Serial1.write((uint8_t) 0);
+    //  softuart.write(1,38400,254, 7, _effect ,55, _count, _color,0);   
+} else if(effect == "ALTERNATING"){
+      _effect = 5;
+                              Serial1.write((uint8_t) 254);
+  Serial1.write((uint8_t) 7);
+  Serial1.write((uint8_t) _effect);
+  Serial1.write((uint8_t) 75);
+  Serial1.write((uint8_t) 50);
+   Serial1.write((uint8_t) _color);
+         Serial1.write((uint8_t) 0);
+    //  softuart.write(1,38400,254, 7, _effect ,75, _count, _color,0);
+} else if(effect == "RECOLOR"){
+      _effect = 7;
+                        Serial1.write((uint8_t) 254);
+  Serial1.write((uint8_t) 6);
+  Serial1.write((uint8_t) _effect);
+  Serial1.write((uint8_t) 50);
+  Serial1.write((uint8_t) 50);
+   Serial1.write((uint8_t) _color);
+    //  softuart.write(1,38400,254, 6, _effect ,50, _count, _color);
+}  else if(effect == "FADE"){
+      _effect = 8;
+                        Serial1.write((uint8_t) 254);
+  Serial1.write((uint8_t) 6);
+  Serial1.write((uint8_t) _effect);
+  Serial1.write((uint8_t) 25);
+  Serial1.write((uint8_t) 50);
+   Serial1.write((uint8_t) _color);
+    //  softuart.write(1,38400,254, 6, _effect ,25, _count, _color);
+} else if(effect == "RAINBOW"){
+      _effect = 9;
+                        Serial1.write((uint8_t) 254);
+  Serial1.write((uint8_t) 5);
+  Serial1.write((uint8_t) _effect);
+  Serial1.write((uint8_t) 150);
+  Serial1.write((uint8_t) 50);
+
+  delay(1000);
+   _effect = 11;
+                              Serial1.write((uint8_t) 254);
+  Serial1.write((uint8_t) 5);
+  Serial1.write((uint8_t) _effect);
+  Serial1.write((uint8_t) 60);
+  Serial1.write((uint8_t) 50);
+
+   //   softuart.write(1,38400,254, 5, _effect ,150, _count);
+}
+
+Serial.println((uint8_t) _color);
+Serial.println((uint8_t) _effect);
+}
+    
+for(int i = 0;i< server.args();i++){
+  Serial.print(server.argName(i));
+   Serial.print(" : ");
+  Serial.println(server.arg(i));
+  
+}
 Serial.println();
 
         String contentType = getContentType(path);
