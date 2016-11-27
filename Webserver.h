@@ -7,10 +7,9 @@
 
 class Webserver : public ESP8266WebServer {
   public:
-  Webserver(uint16_t port) {
-    ESP8266WebServer server(port);
-    //  server.addHandler(new TestHandler());
-    //  server.begin();
+  Webserver(uint16_t port) : ESP8266WebServer(port){}
+
+  void _handleRequest() {
+    ESP8266WebServer::_handleRequest();
   }
-  
 };

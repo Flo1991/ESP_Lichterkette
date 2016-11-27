@@ -417,7 +417,6 @@ void loop() {
           blinkled(_color,lightdata);
           break;
         case RUNLED:
-          Serial.println("CASE");
           initrunled(_color,lightdata,CRGB::Black);
           _effect++;
         case 4:

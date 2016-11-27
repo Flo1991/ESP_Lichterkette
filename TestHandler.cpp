@@ -57,66 +57,40 @@ bool TestHandler::canHandle(HTTPMethod requestMethod, String requestUri)   {
        
 Serial.println(  path.c_str());
 
-if(server.args() == 2) {
+if(server.args() == 3) {
 
 
 String color = server.arg(0);
 String effect = server.arg(1);
-Serial.println("color:" + color); 
-Serial.println("effect:" + effect); 
- if(color == "RED"){ 
-      _color = CRGB::Red;
- }  else if(color == "GREEN"){
-      _color = CRGB::Green;
- }  else if(color == "BLUE"){
-      _color = CRGB::Blue;
- }   else if(color == "TURQUOIS"){
-      _color = CRGB::Turquoise;
- }   else if(color == "ORANGE"){
-      _color = CRGB::Orange;
- }   else if(color == "CYAN"){
-      _color = CRGB::Cyan;
- }  else if(color == "WHITE"){
-      _color = CRGB::White;
- }  else if(color == "VIOLETT"){
-      _color = CRGB::Violet;
- }  else if(color == "PINK"){
-      _color = CRGB::Pink;
- }  else if(color == "YELLOW"){
-      _color = CRGB::Yellow;
- }   else if(color == "BLACK"){
-      _color = CRGB::Black;
- }
+String speedString = server.arg(2);
+effektzeit = atoi(speedString.c_str());
+int r, g, b;
+Serial.println(color);
+int rgb = (int)strtol((const char*) &color.c_str()[1], NULL, 16);
+r = rgb >> 16 & 0xff;
+g = rgb >> 8 & 0xff;
+b = rgb & 0xff;
+_color = CRGB( r, g, b);
+
 
 if(effect == "SETFULLCOLOR") {
       _effect = 0;
-   effektzeit = 1;
-    //  softuart.write(1,38400,254, 6, _effect ,1, _count, _color);
 }else if(effect == "FILLCOLOR"){
       _effect = 1;
-         effektzeit = 25;
 } else if(effect == "BLINK"){
       _effect = 2;
-      effektzeit = 29;
 } else if(effect == "RUNLED"){
       _effect = 3;
-            effektzeit = 55;
 } else if(effect == "ALTERNATING"){
       _effect = 5;
-            effektzeit = 75;
 } else if(effect == "RECOLOR"){
       _effect = 7;
-      effektzeit = 50;
 }  else if(effect == "FADE"){
       _effect = 8;
-      effektzeit = 25;
 } else if(effect == "RAINBOW"){
       _effect = 9;
-     effektzeit = 150;
 }
 
-Serial.println((uint8_t) _color);
-Serial.println((uint8_t) _effect);
 }
     
 for(int i = 0;i< server.args();i++){
