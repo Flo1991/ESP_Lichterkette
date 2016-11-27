@@ -7,6 +7,7 @@
 extern CRGB _color;
 extern uint8_t _effect;
 extern uint8_t effektzeit;
+extern float brightness;
 
 class TestHandler : public RequestHandler {
 

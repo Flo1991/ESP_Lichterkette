@@ -29,6 +29,7 @@ uint32_t usToTicks(uint32_t us) {
 CRGB _color = CRGB::Red;
 uint8_t _effect = 128;
 uint8_t effektzeit = 0;
+float brightness = 1.0f;
 
   CRGB lightdata[NUM_LEDS];  
 
@@ -43,10 +44,6 @@ const char *password = "12345678";
 const uint8_t channel = 12;
 
 Webserver server(80);
-
-
-
-
 
 void setup() {
   ESP.eraseConfig();
@@ -101,20 +98,13 @@ void setfullcolor(CRGB color, CRGB *lightdata) {
 void blinkled(CRGB color, CRGB *lightdata) {
   setfullcolor(color, lightdata);
   FastLED.show();
-  sleep_ms(effektzeit);
+  delay(effektzeit);
   //_delay_ms(50);
   setfullcolor(CRGB::Black, lightdata);
   FastLED.show();
-  sleep_ms(effektzeit);
+  delay(effektzeit);
   //_delay_ms(50);
 }
-
-void sleep_ms(uint16_t sleeptime)
-{
-  delay(sleeptime);
-  
-}
-
 
 void initrainbow(CRGB *lightdata) {
 
@@ -153,6 +143,9 @@ uint16_t i= 0;
       } else {
         color.green = 0x00;
       }
+      color.r *= brightness;
+      color.g *= brightness;
+      color.b *= brightness;
        lightdata[(int)(i*factor)] = color;
   }
 }
@@ -172,13 +165,13 @@ void auffuellen( CRGB color, CRGB backcolor, CRGB *lightdata) {
        // changeled(backcolor,lightdata,j-1);
       } 
       FastLED.show();
-      sleep_ms(effektzeit);
+      delay(effektzeit);
       //_delay_ms(40);
     } 
     //_delay_ms(40);
     server.handleClient();
     // TODO break if there's a client
-    sleep_ms(effektzeit);
+    delay(effektzeit);
   }
 }
 
@@ -227,7 +220,7 @@ void runrunled(CRGB *lightdata, uint8_t richtung)
        FastLED.show();
         rotate(lightdata,1);        
         //_delay_ms(10);
-        sleep_ms(effektzeit);
+        delay(effektzeit);
         server.handleClient();
         // TODO break if there's a client
       }
@@ -237,7 +230,7 @@ void runrunled(CRGB *lightdata, uint8_t richtung)
         rotate(lightdata,0);
         FastLED.show();
         //_delay_ms(10);
-        sleep_ms(effektzeit);
+        delay(effektzeit);
            server.handleClient();
         // TODO break if there's a client
       }
@@ -248,7 +241,7 @@ void runrunled(CRGB *lightdata, uint8_t richtung)
       rotate(lightdata,richtung);
      FastLED.show();
       //_delay_ms(10);
-      sleep_ms(effektzeit);
+      delay(effektzeit);
       
     }
 }
@@ -270,7 +263,7 @@ void runlaufled(CRGB *lightdata )
 { 
      FastLED.show();
     //_delay_ms(250);
-    sleep_ms(effektzeit);
+    delay(effektzeit);
     rotate(lightdata,1);
 }
 
@@ -282,7 +275,7 @@ void neufaerben(CRGB color, CRGB *lightdata)
     lightdata[i] = color;
      FastLED.show();
     //_delay_ms(40);
-    sleep_ms(effektzeit);
+    delay(effektzeit);
    server.handleClient();
         // TODO break if there's a client
   }
@@ -300,7 +293,7 @@ void faden(CRGB color, CRGB *lightdata)
     setfullcolor(color,lightdata);
      FastLED.show();
     //_delay_ms(1);
-    sleep_ms(effektzeit);
+    delay(effektzeit);
     if (color.green > 0)
     {
       --color.green;
@@ -326,7 +319,7 @@ void faden(CRGB color, CRGB *lightdata)
     setfullcolor(color,lightdata);    
       FastLED.show();
     //_delay_ms(1);
-    sleep_ms(effektzeit);
+    delay(effektzeit);
     if (color.green < maxgruen)
     {
       ++color.green;
@@ -364,7 +357,7 @@ void eastereggbase( CRGB color, CRGB *lightdata)
      // transmit2leds(lightdata);
      FastLED.show();
       //_delay_ms(40);
-       sleep_ms(effektzeit); 
+       delay(effektzeit); 
     }
    // if (PacketComplete==1)
   //    break;
@@ -388,14 +381,14 @@ void easteregg(CRGB*lightdata)
   {
   //  if (PacketComplete==1)
   //    break;
-     sleep_ms(50);
+     delay(50);
   } 
   eastereggbase(color,lightdata);
   for (i=0;i<100;i++)
   {
   //  if (PacketComplete==1)
  //   break;
-     sleep_ms(50);
+     delay(50);
   }
 }
 
@@ -443,12 +436,12 @@ void loop() {
           break;
         case ROTATE_R:
           rotate(lightdata,0);
-          sleep_ms(effektzeit);
+          delay(effektzeit);
           FastLED.show();
           break;
         case ROTATE_L:
           rotate(lightdata,1);
-          sleep_ms(effektzeit);
+          delay(effektzeit);
           FastLED.show();
           break;
         case CUSTOM:

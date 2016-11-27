@@ -57,12 +57,14 @@ bool TestHandler::canHandle(HTTPMethod requestMethod, String requestUri)   {
        
 Serial.println(  path.c_str());
 
-if(server.args() == 3) {
+if(server.args() == 4) {
 
 
 String color = server.arg(0);
 String effect = server.arg(1);
 String speedString = server.arg(2);
+String brightnessString = server.arg(3);
+brightness = atof(brightnessString.c_str())/100.0f;
 effektzeit = atoi(speedString.c_str());
 int r, g, b;
 Serial.println(color);
@@ -70,6 +72,9 @@ int rgb = (int)strtol((const char*) &color.c_str()[1], NULL, 16);
 r = rgb >> 16 & 0xff;
 g = rgb >> 8 & 0xff;
 b = rgb & 0xff;
+r *= brightness;
+g *= brightness;
+b *= brightness;
 _color = CRGB( r, g, b);
 
 
