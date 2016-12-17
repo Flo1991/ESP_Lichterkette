@@ -1,5 +1,3 @@
-#include <ESP8266WiFi.h>
-#include <WiFiClient.h> 
 #include "FastLED.h"
 #include "FS.h"
 #include <ESP8266WebServer.h>
@@ -10,12 +8,11 @@ extern uint8_t effektzeit;
 extern float brightness;
 
 class TestHandler : public RequestHandler {
+ public:
+  TestHandler() {}
 
-public:
-TestHandler() { }
-   static String getContentType(const String& path);
-    
-bool canHandle(HTTPMethod requestMethod, String requestUri) override;
+  static String getContentType(const String& path);
 
+  bool canHandle(HTTPMethod requestMethod, String requestUri) override { return true; }
   bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override; 
 };
