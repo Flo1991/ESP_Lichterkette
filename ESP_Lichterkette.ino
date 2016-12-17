@@ -432,7 +432,6 @@ void loop() {
           initrainbow(lightdata);
           FastLED.show();
           _effect = 10;
-          effektzeit = 20;
           break;
         case ROTATE_R:
           rotate(lightdata,0);
