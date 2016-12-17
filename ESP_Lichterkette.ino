@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h> 
 #include "Webserver.h"
+#include "TestHandler.h"
 
 #define FASTLED_INTERRUPT_RETRY_COUNT 0 
 #include "FastLED.h"
@@ -150,31 +151,23 @@ uint16_t i= 0;
   }
 }
 
-void auffuellen( CRGB color, CRGB backcolor, CRGB *lightdata) {
-  uint8_t i,j;
-  for (i=0;i<NUM_LEDS;i++)
-  {
-    //setfullcolor(backcolor,lightdata);
-    for (j=0;j<NUM_LEDS-i;j++)
-    {
-      //changeled(color,lightdata,j);
+void auffuellen(CRGB color, CRGB backcolor, CRGB *lightdata) {
+  setfullcolor(backcolor, lightdata);
+  for (uint_fast8_t i = 0; i < NUM_LEDS; i++) {
+    for (uint_fast8_t j = 0; j < NUM_LEDS - i; j++) {
       lightdata[j] = color;
-      if (j>0)
-      {
-        lightdata[j-1] = backcolor;
-       // changeled(backcolor,lightdata,j-1);
+      if (j > 0) {
+        lightdata[j - 1] = backcolor;
       } 
       FastLED.show();
+      if (server.handleClient()) {
+        return;
+      }
       delay(effektzeit);
-      //_delay_ms(40);
-    } 
-    //_delay_ms(40);
-    server.handleClient();
-    // TODO break if there's a client
+    }
     delay(effektzeit);
   }
 }
-
 
 void rotate(CRGB *lightdata, uint8_t richtung)
 {
