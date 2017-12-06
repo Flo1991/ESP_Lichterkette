@@ -15,4 +15,9 @@ class TestHandler : public RequestHandler {
 
   bool canHandle(HTTPMethod requestMethod, String requestUri) override { return true; }
   bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override; 
+  bool canUpload(String uri) override { (void) uri; Serial.println("canUpload"); return true; } ;
+  void upload(ESP8266WebServer& server, String requestUri, HTTPUpload& upload) override;
+
+ private:
+  File fsUploadFile;              // a File object to temporarily store the received file
 };
