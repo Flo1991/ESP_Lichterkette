@@ -2,7 +2,7 @@
 
 
 /**
- * Same as ESP8266WebServer but with _handleRequest() and handleClient() returning if a client was successfully handled by the request hander.
+ * Same as ESP8266WebServer but with _handleRequest() and handleClient() returning if a client was successfully handled by the request handler.
  */
 class Webserver : public ESP8266WebServer {
  public:
