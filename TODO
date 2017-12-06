@@ -1,3 +1,6 @@
 - make effects interruptable
 - make num of leds etc configurable
-- ota update
+- ota update for firmware
+- sites to list and delete SPIFFS files
+- check if uploaded files fit into SPIFFS
+
