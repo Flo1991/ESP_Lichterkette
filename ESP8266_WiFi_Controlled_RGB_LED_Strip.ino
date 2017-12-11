@@ -10,8 +10,6 @@
 const uint8_t NUM_LEDS = 148;
 #define TIMER1_TICKS_PER_US (APB_CLK_FREQ / 1000000L)
 
-
-
 //EFFECTS
 #define SETFULLCOLOR 0
 #define AUFFUELLEN 1
@@ -47,28 +45,6 @@ const char *password = "12345678";
 const uint8_t channel = 6;
 
 Webserver server(80);
-
-void handleFileUpload() {
-  Serial.println("UPLOAD");
-  /* if(server.uri() != "/edit") return;
-    HTTPUpload& upload = server.upload();
-    if(upload.status == UPLOAD_FILE_START){
-     String filename = upload.filename;
-     if(!filename.startsWith("/")) filename = "/"+filename;
-     DBG_OUTPUT_PORT.print("handleFileUpload Name: "); DBG_OUTPUT_PORT.println(filename);
-     fsUploadFile = SPIFFS.open(filename, "w");
-     filename = String();
-    } else if(upload.status == UPLOAD_FILE_WRITE){
-     //DBG_OUTPUT_PORT.print("handleFileUpload Data: "); DBG_OUTPUT_PORT.println(upload.currentSize);
-     if(fsUploadFile)
-       fsUploadFile.write(upload.buf, upload.currentSize);
-    } else if(upload.status == UPLOAD_FILE_END){
-     if(fsUploadFile)
-       fsUploadFile.close();
-     DBG_OUTPUT_PORT.print("handleFileUpload Size: "); DBG_OUTPUT_PORT.println(upload.totalSize);
-    }*/
-}
-
 
 void setup() {
   ESP.eraseConfig();
@@ -111,37 +87,6 @@ void setup() {
 
   server.addHandler(new TestHandler());
 
-
-
-  //server.on("/upload", HTTP_POST, [](){ server.send(200, "text/plain", ""); }, handleFileUpload);
-
-
-  /* server.onFileUpload([](){
-       File fsUploadFile;              // a File object to temporarily store the received file
-       Serial.println("file upload");
-       //if(server.uri() != "/update") return;*/
-  /*     HTTPUpload& upload = server.upload();
-          Serial.print("status: "); Serial.println(upload.status);
-    if(upload.status == UPLOAD_FILE_START){
-     String filename = upload.filename;
-     if(!filename.startsWith("/")) filename = "/"+filename;
-     Serial.print("handleFileUpload Name: "); Serial.println(filename);
-     fsUploadFile = SPIFFS.open(filename, "w");            // Open the file for writing in SPIFFS (create if it doesn't exist)
-     filename = String();
-    } else if(upload.status == UPLOAD_FILE_WRITE){
-     if(fsUploadFile)
-       fsUploadFile.write(upload.buf, upload.currentSize); // Write the received bytes to the file
-    } else if(upload.status == UPLOAD_FILE_END){
-     if(fsUploadFile) {                                    // If the file was successfully created
-       fsUploadFile.close();                               // Close the file again
-       Serial.print("handleFileUpload Size: "); Serial.println(upload.totalSize);
-       server.sendHeader("Location","/success.html");      // Redirect the client to the success page
-       server.send(303);
-     } else {
-       server.send(500, "text/plain", "500: couldn't create file");
-     }
-    }
-    });*/
   server.begin();
   Serial.println("HTTP server started");
 }
