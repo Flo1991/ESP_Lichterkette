@@ -1,4 +1,13 @@
 #include "TestHandler.h"
+#include "StreamString.h"
+static const char serverIndex[] PROGMEM =
+  R"(<html><body><form method='POST' action='' enctype='multipart/form-data'>
+                  <input type='file' name='update'>
+                  <input type='submit' value='Update'>
+               </form>
+         </body></html>)";
+static const char successResponse[] PROGMEM = 
+"<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
 
 String  TestHandler::getContentType(const String& path) {
   if (path.endsWith(".html")) return "text/html";
@@ -26,27 +35,84 @@ String  TestHandler::getContentType(const String& path) {
 }
 
 void TestHandler::upload(ESP8266WebServer& server, String requestUri, HTTPUpload& upload) {
-  Serial.print("status: "); Serial.println(upload.status);
-  if(upload.status == UPLOAD_FILE_START){
-    String filename = upload.filename;
-    if(!filename.startsWith("/")) filename = "/"+filename;
-    Serial.print("handleFileUpload Name: "); Serial.println(filename);
-    fsUploadFile = SPIFFS.open(filename, "w");            // Open the file for writing in SPIFFS (create if it doesn't exist)
-    filename = String();
-  } else if(upload.status == UPLOAD_FILE_WRITE){
-    if(fsUploadFile) {
-      fsUploadFile.write(upload.buf, upload.currentSize); // Write the received bytes to the file
+  Serial.print("requestUri"); Serial.println(requestUri);
+  if(requestUri == "/upload.html") {
+    Serial.print("status: "); Serial.println(upload.status);
+    if(upload.status == UPLOAD_FILE_START){
+      String filename = upload.filename;
+      if(!filename.startsWith("/")) filename = "/"+filename;
+      Serial.print("handleFileUpload Name: "); Serial.println(filename);
+      fsUploadFile = SPIFFS.open(filename, "w");            // Open the file for writing in SPIFFS (create if it doesn't exist)
+      filename = String();
+    } else if(upload.status == UPLOAD_FILE_WRITE){
+      if(fsUploadFile) {
+        fsUploadFile.write(upload.buf, upload.currentSize); // Write the received bytes to the file
+      }
+    } else if(upload.status == UPLOAD_FILE_END){
+      if(fsUploadFile) {                                    // If the file was successfully created
+        fsUploadFile.close();                               // Close the file again
+        Serial.print("handleFileUpload Size: "); Serial.println(upload.totalSize);
+        server.sendHeader("Location","/success.html");      // Redirect the client to the success page
+        server.send(303);
+      } else {
+        server.send(500, "text/plain", "500: couldn't create file");
+      }
     }
-  } else if(upload.status == UPLOAD_FILE_END){
-    if(fsUploadFile) {                                    // If the file was successfully created
-      fsUploadFile.close();                               // Close the file again
-      Serial.print("handleFileUpload Size: "); Serial.println(upload.totalSize);
-      server.sendHeader("Location","/success.html");      // Redirect the client to the success page
-      server.send(303);
-    } else {
-      server.send(500, "text/plain", "500: couldn't create file");
-    }
+  } else if(requestUri == "/ota.html") {
+
+      if(upload.status == UPLOAD_FILE_START){
+        _updaterError = String();
+//        if (_serial_output)
+          Serial.setDebugOutput(true);
+uploadedSize = 0;
+//        _authenticated = (_username == NULL || _password == NULL || _server->authenticate(_username, _password));
+/*        if(!_authenticated){
+       //   if (_serial_output)
+            Serial.printf("Unauthenticated Update\n");
+          return;
+        }*/
+
+//        WiFiUDP::stopAll();
+       // if (_serial_output)
+          Serial.printf("Update: %s\n", upload.filename.c_str());
+        uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+        Serial.print("maxsketchpace: "); Serial.println(maxSketchSpace);
+        Serial.print("size: "); Serial.println(Update.size());
+        if(!Update.begin(maxSketchSpace)){//start with max available size
+          _setUpdaterError();
+        }
+      } else if(/*_authenticated &&*/ upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()){
+        /*if (_serial_output)*/ //Serial.printf(".");
+        Serial.println(upload.currentSize);
+        uploadedSize += upload.currentSize;
+        Serial.print("uploadedsize: "); Serial.println(uploadedSize);
+                Serial.print("size: "); Serial.println(Update.size());
+        if(Update.write(upload.buf, upload.currentSize) != upload.currentSize){
+          _setUpdaterError();
+        }
+      } else if(/*_authenticated &&*/ upload.status == UPLOAD_FILE_END && !_updaterError.length()){
+        if(Update.end(true)){ //true to set the size to the current progress
+          /*if (_serial_output)*/ Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
+        } else {
+          _setUpdaterError();
+        }
+        /*if (_serial_output)*/ Serial.setDebugOutput(false);
+      } else if(/*_authenticated &&*/ upload.status == UPLOAD_FILE_ABORTED){
+        Update.end();
+        /*if (_serial_output)*/ Serial.println("Update was aborted");
+      }
+      delay(0);
+}
+    
   }
+//}
+
+void TestHandler::_setUpdaterError()
+{
+/*  if (_serial_output)*/ Update.printError(Serial);
+  StreamString str;
+  Update.printError(str);
+  _updaterError = str.c_str();
 }
 
 bool TestHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri)  {
@@ -58,7 +124,19 @@ bool TestHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, Str
   if(requestMethod == HTTP_POST && requestUri == "/upload.html") {
      server.send(200);
      return true;
-  }
+  } else if(requestMethod == HTTP_POST && requestUri == "/ota.html") {
+    if (Update.hasError()) {
+        server.send(200, F("text/html"), String(F("Update error: ")) + _updaterError);
+      } else {
+        server.client().setNoDelay(true);
+        server.send_P(200, PSTR("text/html"), successResponse);
+        delay(100);
+        server.client().stop();
+        ESP.restart();
+     }
+  } else if(requestMethod == HTTP_GET && requestUri == "/ota.html") {
+      server.send_P(200, PSTR("text/html"), serverIndex);
+  } else {
 
   // Append whatever follows this URI in request to get the file path.
   String path(requestUri);
@@ -107,4 +185,5 @@ bool TestHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, Str
   
   server.streamFile(f, contentType);
   return true;
+  }
 }

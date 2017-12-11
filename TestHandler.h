@@ -20,4 +20,7 @@ class TestHandler : public RequestHandler {
 
  private:
   File fsUploadFile;              // a File object to temporarily store the received file
+  String _updaterError;
+  int uploadedSize;
+  void _setUpdaterError();
 };
