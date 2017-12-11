@@ -54,7 +54,8 @@ bool TestHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, Str
   if (requestUri.endsWith("/")) {
     requestUri += "index.html";
   }
-  if(requestMethod == HTTP_POST) {
+  Serial.println(requestUri);
+  if(requestMethod == HTTP_POST && requestUri == "/upload.html") {
      server.send(200);
      return true;
   }
