@@ -136,6 +136,29 @@ bool TestHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, Str
      }
   } else if(requestMethod == HTTP_GET && requestUri == "/ota.html") {
       server.send_P(200, PSTR("text/html"), serverIndex);
+  } else if(requestMethod == HTTP_GET && requestUri == "/list.html") {
+    //  if(!server.hasArg("dir")) {server.send(500, "text/plain", "BAD ARGS"); return;}
+        
+         String path = "/"; //server.arg("dir");
+        //DBG_OUTPUT_PORT.println("handleFileList: " + path);
+        Dir dir = SPIFFS.openDir(path);
+        path = String();
+      
+        String output = "[";
+        while(dir.next()){
+          File entry = dir.openFile("r");
+          if (output != "[") output += ',';
+          bool isDir = false;
+          output += "{\"type\":\"";
+          output += (isDir)?"dir":"file";
+          output += "\",\"name\":\"";
+          output += String(entry.name()).substring(1);
+          output += "\"}";
+          entry.close();
+        }
+        
+        output += "]";
+      server.send(200, "text/json", output);
   } else {
 
   // Append whatever follows this URI in request to get the file path.
