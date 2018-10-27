@@ -1,0 +1,6 @@
+- make effects interruptable
+- make num of leds etc configurable
+- authentication for ota firmware update
+- sites to list and delete SPIFFS files
+- check if uploaded files fit into SPIFFS
+
